@@ -16,6 +16,18 @@ OPENING_HINTS = [
 
 
 @lru_cache(maxsize=1)
+def app_css():
+    css = (UI / 'app.css').read_text()
+    for token, filename in [('GEIST_DATA', 'Geist.ttf'), ('SERIF_DATA', 'InstrumentSerif-Italic.ttf')]:
+        css = css.replace(token, base64.b64encode((UI / 'fonts' / filename).read_bytes()).decode())
+    return css
+
+
+def brand_html():
+    return '''<div class="pi-brand"><span class="pi-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Process<span class="pi-brand-iq">IQ</span><small>WORKFLOW INTELLIGENCE</small></span></div>'''
+
+
+@lru_cache(maxsize=1)
 def interview_css():
     css = (UI / 'interview.css').read_text()
     for token, filename in [('GEIST_DATA','Geist.ttf'),('SERIF_DATA','InstrumentSerif-Italic.ttf')]:

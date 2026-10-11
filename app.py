@@ -1,6 +1,7 @@
 """ProcessIQ: AI interview, owner fact review, and deterministic dashboard."""
 
 from pathlib import Path
+from html import escape
 import time
 
 from pydantic import ValidationError
@@ -16,7 +17,7 @@ from processiq.recommendations import generate_plan, workflow_fingerprint
 from processiq.report import render_plan
 from processiq.llm import InterviewError, OpenAIInterviewer, OpenAIPlanner
 
-from processiq.presentation import interview_css, question_html, answer_hints, enhance_hints
+from processiq.presentation import app_css, brand_html, interview_css, question_html, answer_hints, enhance_hints
 from processiq.speech import transcribe_recording
 
 DATA = Path(__file__).resolve().parent / "data"
@@ -47,14 +48,20 @@ def load_demo(name: str) -> None:
     st.session_state.interview_session = InterviewSession()
     st.session_state.review_backup = {}
     st.session_state.workflow_confirmed = True
+    st.session_state.workspace = "Workflow"
     st.session_state.epoch = st.session_state.get("epoch", -1) + 1
 
 
 def initialize_session() -> None:
     """Backfill state after code reloads without replacing the owner's work."""
     if "workflow" not in st.session_state:
-        load_demo("Complete contractor demo")
-        st.session_state.show_start = True
+        preview = st.query_params.get("demo")
+        load_demo("Incomplete contractor demo" if preview == "incomplete" else "Complete contractor demo")
+        st.session_state.show_start = preview not in ("complete", "incomplete")
+        if not st.session_state.show_start:
+            st.session_state.analysis = analyze_workflow(st.session_state.workflow)
+            st.session_state.analysis_snapshot = workflow_fingerprint(st.session_state.workflow)
+            st.session_state.workspace = "Overview"
     defaults = {
         "loaded_demo": "Owner-described process" if st.session_state.workflow.data_kind == "owner_provided" else "Complete contractor demo",
         "analysis": None,
@@ -71,6 +78,7 @@ def initialize_session() -> None:
         "interview_epoch": 0,
         "review_backup": {},
         "workflow_confirmed": st.session_state.workflow.data_kind == "synthetic",
+        "workspace": "Overview" if st.session_state.get("analysis") is not None else "Workflow",
     }
     for key, value in defaults.items():
         st.session_state.setdefault(key, value)
@@ -95,71 +103,83 @@ def backup_review() -> None:
 
 
 def render_start() -> None:
+    st.html(f"<style>{app_css()}</style>")
     st.html(f"<style>{(DATA.parent / 'processiq/ui/start.css').read_text()}</style>")
-    with st.sidebar:
-        st.title("ProcessIQ")
-        st.caption("WORKFLOW INTELLIGENCE")
-        st.divider()
-        st.write("**1 · Add your workflow**")
-        st.caption("2 · Review your facts")
-        st.caption("3 · Explore your dashboard")
-        st.caption("4 · Choose your next improvement")
-    with st.container(key="start-screen"):
-        st.caption("A CLEARER VIEW OF YOUR BUSINESS")
-        st.title("Choose how to get started")
-        st.write("Upload your workflow, explore a sample, or talk it through.")
-        choice = st.radio(
-            "Choose a data source", ["Upload a CSV", "Use sample data", "AI interview (optional)"],
-            captions=[
-                "Bring your own steps, timing, and costs. Go straight to review.",
-                "Explore a ready-made contractor workflow with synthetic data.",
-                "Describe your work and let AI help you build a workflow.",
-            ], label_visibility="collapsed", key="start-source", width="stretch",
-        )
-        if choice == "Upload a CSV":
-            uploaded = st.file_uploader("Your workflow CSV", type=["csv"], max_upload_size=2)
-            st.caption("One row per step, in order. Unknown values can stay blank. No interview required.")
-            st.download_button("Download CSV template", data=(DATA / "workflow_template.csv").read_bytes(),
-                               file_name="processiq_workflow_template.csv", mime="text/csv")
-            with st.expander("What should my CSV include?"):
-                st.write("Only **step_name** is required. Add **active_minutes**, **waiting_minutes**, **people**, **hourly_rate_usd**, **monthly_volume**, and **responsible_role** where known.")
-                st.write("Time is per case, in minutes. Waiting is before that step. People work on that step; the rate is USD per person per hour. Monthly volume is cases for the whole workflow, not a separate frequency for each task.")
-                st.caption("Optional: process_name, start_point, end_point, currency (USD). Repeat workflow details consistently or fill them on the first row only. The template contains fictional example values—replace them with your own. Maximum 200 steps, 2 MB; save as CSV UTF-8.")
-            if st.button("Review uploaded data", type="primary", width="stretch", disabled=uploaded is None):
-                try:
-                    workflow = parse_workflow_csv(uploaded.getvalue(), filename=uploaded.name)
-                except CsvImportError as exc:
-                    st.error(str(exc))
-                else:
-                    st.session_state.update(
-                        workflow=workflow, loaded_demo=f"CSV upload · {uploaded.name}",
-                        workflow_confirmed=False, analysis=None, analysis_snapshot=None,
-                        plan=None, dirty=False, interviewing=False, show_start=False,
-                        source_picker_return=False, interview_session=InterviewSession(),
-                        review_backup={}, notice="CSV loaded. Review and confirm your facts, then calculate your dashboard.",
-                    )
-                    st.session_state.epoch += 1
-                    st.rerun()
-        elif choice == "Use sample data":
-            selected = st.selectbox("Sample workflow", list(DEMOS))
-            st.caption("Synthetic examples work without an API key. Try the incomplete sample to see how unknowns are handled.")
-            if st.button("Load selected demo", type="primary", width="stretch"):
-                load_demo(selected)
+    st.html(brand_html())
+    with st.container(key="start-layout"):
+        story, source = st.columns([1.05, 1], gap="large", vertical_alignment="center")
+        with story:
+            st.html('''<div class="pi-start-story"><span class="pi-eyebrow">A CLEARER VIEW OF YOUR BUSINESS</span>
+                <h1>A little clarity.<br>A <em>better</em> workday.</h1>
+                <p>See where your time goes. Understand what work costs. Find your next meaningful improvement.</p>
+                <div class="pi-start-promise"><span>01 &nbsp; Bring your workflow</span><span>02 &nbsp; Make sense of the details</span><span>03 &nbsp; Move forward with confidence</span></div>
+                <div class="pi-route" aria-hidden="true"><i></i><b></b><i></i><b></b><i></i></div>
+                <div class="pi-note">Your knowledge. A clearer perspective.</div></div>''')
+        with source, st.container(key="start-screen", border=True):
+            render_source_picker()
+
+
+def render_source_picker() -> None:
+    st.subheader("Start with what you know")
+    st.caption("One workflow. A few facts. Useful perspective.")
+    choice = st.radio(
+        "Choose a data source", ["Upload a CSV", "Use sample data", "AI interview (optional)"],
+        captions=[
+            "Bring your own steps, timing, and costs. Go straight to review.",
+            "Explore a ready-made contractor workflow with synthetic data.",
+            "Describe your work and let AI help you build a workflow.",
+        ], label_visibility="collapsed", key="start-source", width="stretch",
+    )
+    if choice == "Upload a CSV":
+        uploaded = st.file_uploader("Your workflow CSV", type=["csv"], max_upload_size=2)
+        st.caption("One row per step, in order. Unknown values can stay blank. No interview required.")
+        st.download_button("Download CSV template", data=(DATA / "workflow_template.csv").read_bytes(),
+                           file_name="processiq_workflow_template.csv", mime="text/csv")
+        with st.expander("What should my CSV include?"):
+            st.write("Only **step_name** is required. Add **active_minutes**, **waiting_minutes**, **people**, **hourly_rate_usd**, **monthly_volume**, and **responsible_role** where known.")
+            st.write("Time is per case, in minutes. Waiting is before that step. People work on that step; the rate is USD per person per hour. Monthly volume is cases for the whole workflow, not a separate frequency for each task.")
+            st.caption("Optional: process_name, start_point, end_point, currency (USD). Repeat workflow details consistently or fill them on the first row only. The template contains fictional example values—replace them with your own. Maximum 200 steps, 2 MB; save as CSV UTF-8.")
+        if st.button("Review uploaded data", type="primary", width="stretch", disabled=uploaded is None):
+            try:
+                workflow = parse_workflow_csv(uploaded.getvalue(), filename=uploaded.name)
+            except CsvImportError as exc:
+                st.error(str(exc))
+            else:
+                st.session_state.update(
+                    workflow=workflow, loaded_demo=f"CSV upload · {uploaded.name}",
+                    workflow_confirmed=False, analysis=None, analysis_snapshot=None,
+                    plan=None, dirty=False, interviewing=False, show_start=False,
+                    source_picker_return=False, interview_session=InterviewSession(),
+                    review_backup={}, workspace="Workflow", notice="CSV loaded. Review and confirm your facts, then calculate your dashboard.",
+                )
+                st.session_state.epoch += 1
                 st.rerun()
-        else:
-            st.caption("Prefer a conversation? Answer at your own pace and review the extracted facts. This option uses your configured OpenAI API key.")
-            if st.button("Start AI interview", type="primary", width="stretch"):
-                start_interview()
-                st.rerun()
-        if st.session_state.source_picker_return and st.button("Return to saved process"):
-            for key, value in st.session_state.review_backup.items():
-                st.session_state[key] = value
-            for key, value in st.session_state.interview_answer_backup.items():
-                st.session_state[key] = value
-            st.session_state.interview_answer_backup = {}
-            st.session_state.show_start = False
-            st.session_state.source_picker_return = False
+    elif choice == "Use sample data":
+        selected = st.selectbox("Sample workflow", list(DEMOS))
+        st.caption("Synthetic examples work without an API key. Try the incomplete sample to see how unknowns are handled.")
+        if st.button("Load selected demo", type="primary", width="stretch"):
+            load_demo(selected)
             st.rerun()
+        if st.button("Explore sample dashboard", width="stretch", icon=":material/arrow_forward:"):
+            load_demo(selected)
+            st.session_state.analysis = analyze_workflow(st.session_state.workflow)
+            st.session_state.analysis_snapshot = workflow_fingerprint(st.session_state.workflow)
+            st.session_state.workspace = "Overview"
+            st.rerun()
+    else:
+        st.caption("Prefer a conversation? Answer at your own pace and review the extracted facts. This option uses your configured OpenAI API key.")
+        if st.button("Start AI interview", type="primary", width="stretch"):
+            start_interview()
+            st.rerun()
+    if st.session_state.source_picker_return and st.button("Return to saved process"):
+        for key, value in st.session_state.review_backup.items():
+            st.session_state[key] = value
+        for key, value in st.session_state.interview_answer_backup.items():
+            st.session_state[key] = value
+        st.session_state.interview_answer_backup = {}
+        st.session_state.show_start = False
+        st.session_state.source_picker_return = False
+        st.rerun()
 
 
 def guard_saved_results() -> None:
@@ -185,6 +205,7 @@ def invalidate() -> None:
     st.session_state.analysis = None
     st.session_state.plan = None
     st.session_state.notice = ""
+    st.session_state.workspace = "Workflow"
 
 
 def fact_changed(confirmation_key: str) -> None:
@@ -387,6 +408,7 @@ def render_interview() -> None:
                     st.session_state.analysis = None
                     st.session_state.plan = None
                     st.session_state.notice = "Check the discovered workflow, then confirm only the facts you know."
+                    st.session_state.workspace = "Workflow"
                     st.session_state.epoch += 1
                     st.rerun()
 
@@ -394,9 +416,8 @@ def render_interview() -> None:
 def render_plan_controls() -> None:
     if st.session_state.plan is not None and st.session_state.plan.snapshot != workflow_fingerprint(st.session_state.workflow):
         st.session_state.plan = None
-    st.divider()
-    st.subheader("Turn findings into actions")
-    st.caption("Generate AI plan sends the saved assessment and its evidence to OpenAI. The offline option works without an API key. Every displayed number stays calculated by Python.")
+    st.html('<div class="pi-section-intro"><span class="pi-eyebrow">YOUR NEXT MOVE</span><h2>Small changes. Meaningful progress.</h2><p>Turn your reviewed findings into a practical experiment for your team.</p></div>')
+    st.caption("The offline plan uses your reviewed facts. Generate AI plan sends the saved assessment and its evidence to OpenAI to prioritize suggestions.")
     offline, live = st.columns(2)
     create_offline = offline.button("Create offline plan", width="stretch", disabled=st.session_state.dirty)
     create_live = live.button("Generate AI plan", type="primary", width="stretch", disabled=st.session_state.dirty)
@@ -412,10 +433,67 @@ def render_plan_controls() -> None:
             st.session_state.plan = plan
     if st.session_state.plan is not None:
         render_plan(st.session_state.plan)
+    else:
+        st.html('<div class="pi-empty-plan"><div class="pi-empty-icon">↗</div><h3>A good next step starts with the facts.</h3><p>Create a plan to see suggested actions, who could lead them, and how to tell whether they help.</p><span class="pi-note">No promised savings. Just a thoughtful place to start.</span></div>')
+
+
+def navigate_workspace(view: str) -> None:
+    st.session_state.workspace = view
+
+
+def render_sidebar() -> None:
+    with st.sidebar:
+        st.html(brand_html())
+        st.html('<div class="pi-nav-label">YOUR WORKSPACE</div>')
+        icons = {"Overview": "space_dashboard", "Workflow": "account_tree", "Improvements": "north_east", "What if": "tune"}
+        for view, icon in icons.items():
+            st.button(view, key=f"nav-{view}", icon=f":material/{icon}:", width="stretch",
+                      type="primary" if st.session_state.workspace == view else "tertiary",
+                      on_click=navigate_workspace, args=(view,))
+        st.html('<div class="pi-sidebar-separator"></div>')
+        with st.container(key="sidebar-context"):
+            st.caption("CURRENT ASSESSMENT")
+            workflow = st.session_state.workflow
+            name = workflow.name.replace(" (synthetic demo)", "")
+            st.write(name)
+            st.caption(f"{len(workflow.steps)} steps · USD · Sequential workflow")
+            if st.session_state.dirty:
+                st.caption("● Unsaved changes")
+            elif st.session_state.analysis is not None:
+                st.caption("● Insights up to date")
+            else:
+                st.caption("○ Ready for review")
+        with st.expander("Data & options"):
+            st.button("Choose data source", on_click=choose_data_source, width="stretch")
+            if st.button("Start AI interview", width="stretch"):
+                start_interview()
+                st.rerun()
+            selected = st.radio("Synthetic examples", list(DEMOS))
+            if st.button("Load selected demo", width="stretch"):
+                load_demo(selected)
+                st.rerun()
+            if st.session_state.loaded_demo in DEMOS:
+                if st.button("Reset current demo", width="stretch"):
+                    load_demo(st.session_state.loaded_demo)
+                    st.rerun()
+        st.html('<div class="pi-sidebar-foot"><span>Clarity for the way you work.</span><small>Session only · Save your source data.<br>Refreshing may clear this assessment.</small></div>')
+
+
+def render_process_header() -> None:
+    workflow = st.session_state.workflow
+    facts = [workflow.monthly_volume] + [getattr(step, field) for step in workflow.steps for field in FACT_FIELDS]
+    reviewed = sum(fact.value is not None and fact.confirmed for fact in facts)
+    source = "Synthetic sample" if workflow.data_kind == "synthetic" else "Your workflow"
+    name = workflow.name.replace(" (synthetic demo)", "")
+    title, action = st.columns([5, 1.1], vertical_alignment="center")
+    with title:
+        st.html(f'<div class="pi-page-heading"><span class="pi-eyebrow">WORKFLOW ASSESSMENT</span><h1>{escape(name)}</h1><div class="pi-meta"><span class="pi-chip">{source}</span><span>{len(workflow.steps)} steps</span><span>{reviewed} of {len(facts)} facts reviewed</span></div></div>')
+    with action:
+        st.button("Review facts", icon=":material/edit_note:", width="stretch", on_click=navigate_workspace, args=("Workflow",))
 
 
 def main() -> None:
-    st.set_page_config(page_title="ProcessIQ | Process assessment", page_icon="🔎", layout="wide")
+    st.set_page_config(page_title="ProcessIQ | Workflow intelligence", page_icon="✳", layout="wide", initial_sidebar_state="expanded")
     initialize_session()
     guard_saved_results()
     if st.session_state.show_start:
@@ -424,56 +502,50 @@ def main() -> None:
     if st.session_state.interviewing:
         render_interview()
         return
-    st.html("""<style>
-    .stMainBlockContainer {max-width: 1180px; padding-top: 3rem; padding-bottom: 3rem;}
-    h1 {letter-spacing: -.035em;} h3 {letter-spacing: -.015em;}
-    [data-testid="stVerticalBlockBorderWrapper"] {background: white; border-radius: 16px;}
-    [data-testid="stMetric"] {background: white; border: 1px solid #E0E9E5; padding: 18px; border-radius: 14px;}
-    [data-testid="stMetricValue"] {font-size: clamp(1.4rem, 2.6vw, 2rem);}
-    .stButton button {border-radius: 10px; min-height: 44px;}
-    [data-testid="stExpander"] {background: white; border-radius: 12px;}
-    [data-testid="stCaptionContainer"] {color: #516967;}
-    @media (max-width: 700px) {
-      .stMainBlockContainer {padding: 1.4rem 1rem;}
-      [data-testid="stHorizontalBlock"] {flex-wrap: wrap; gap: .7rem;}
-      [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {min-width: min(100%, 240px); flex: 1 1 240px;}
-      [data-testid="stMetricValue"] {font-size: 1.8rem;}
-      h1 {font-size: 2rem;} h3 {font-size: 1.25rem;}
-    }
-    </style>""")
-    with st.sidebar:
-        st.title("ProcessIQ")
-        st.caption("Understand your process. Find your next improvement.")
-        st.button("Choose data source", on_click=choose_data_source, width="stretch")
-        if st.button("Start AI interview", type="primary", width="stretch"):
-            start_interview()
+    pending = st.session_state.pop("pending_workspace", None)
+    if pending:
+        st.session_state.workspace = pending
+    st.html(f"<style>{app_css()}</style>")
+    render_sidebar()
+    render_process_header()
+    overview, workflow_tab, improvement_tab, scenario_tab = st.tabs(
+        ["Overview", "Workflow", "Improvements", "What if"], key="workspace", on_change="rerun",
+    )
+    # Keep the review widgets mounted across workspaces so pending values and
+    # confirmations survive navigation. Their callbacks remain authoritative.
+    with workflow_tab:
+        st.html('<div class="pi-section-intro"><span class="pi-eyebrow">THE FACTS BEHIND YOUR INSIGHTS</span><h2>A clear picture starts here.</h2><p>Review what you know. Leave the rest unknown. You can refine it as you go.</p></div>')
+        render_review(st.session_state.workflow)
+        if st.button("Calculate dashboard", disabled=st.session_state.dirty or not st.session_state.workflow_confirmed,
+                     type="primary", width="stretch", icon=":material/arrow_forward:"):
+            st.session_state.plan = None
+            st.session_state.analysis = analyze_workflow(st.session_state.workflow)
+            st.session_state.analysis_snapshot = workflow_fingerprint(st.session_state.workflow)
+            st.session_state.pending_workspace = "Overview"
             st.rerun()
-        selected = st.radio("Synthetic examples", list(DEMOS))
-        if st.button("Load selected demo", width="stretch"):
-            load_demo(selected)
-            st.rerun()
-        if st.session_state.loaded_demo in DEMOS:
-            if st.button("Reset current demo", width="stretch"):
-                load_demo(st.session_state.loaded_demo)
-                st.rerun()
-        st.divider()
-        st.caption("Week 1 course demo · Interview, assessment & improvement plan")
-        st.caption("One sequential workflow. Session data is temporary; a refresh may clear edits.")
-    st.title("Your workflow, made clear")
-    st.caption("Review → Dashboard → Action plan")
-    kind = "Synthetic course demo" if st.session_state.workflow.data_kind == "synthetic" else "Owner-provided draft"
-    st.info(f"{kind} · {st.session_state.loaded_demo}")
-    render_review(st.session_state.workflow)
-    st.divider()
-    if st.button("Calculate dashboard", disabled=st.session_state.dirty or not st.session_state.workflow_confirmed, type="primary", width="stretch"):
-        st.session_state.plan = None
-        st.session_state.analysis = analyze_workflow(st.session_state.workflow)
-        st.session_state.analysis_snapshot = workflow_fingerprint(st.session_state.workflow)
-    if st.session_state.analysis is not None:
-        render_dashboard(st.session_state.analysis)
-        render_plan_controls()
-    else:
-        st.caption("Your dashboard will appear here after you calculate the saved facts. Incomplete inputs are supported.")
+    with overview:
+        if st.session_state.analysis is not None:
+            render_dashboard(st.session_state.analysis, st.session_state.workflow)
+            with st.container(key="next-action", border=True):
+                copy, cta = st.columns([3, 1], vertical_alignment="center")
+                with copy:
+                    st.html('<span class="pi-eyebrow">FROM UNDERSTANDING TO ACTION</span><h3>Make your next improvement a thoughtful one.</h3><p class="pi-note">Explore practical experiments based on the facts you reviewed.</p>')
+                with cta:
+                    st.button("Explore improvements", on_click=navigate_workspace, args=("Improvements",), type="primary", width="stretch")
+        else:
+            st.html('<div class="pi-empty-plan"><div class="pi-empty-icon">◎</div><h2>Your perspective starts with the facts.</h2><p>Review your workflow and calculate your dashboard to discover where time and labor go.</p></div>')
+            st.button("Go to workflow", on_click=navigate_workspace, args=("Workflow",), type="primary")
+    with improvement_tab:
+        if st.session_state.analysis is not None:
+            render_plan_controls()
+        else:
+            st.info("Calculate your reviewed workflow to explore improvements.")
+    with scenario_tab:
+        if st.session_state.analysis is not None:
+            from processiq.scenario_ui import render_scenarios
+            render_scenarios(st.session_state.workflow, st.session_state.analysis)
+        else:
+            st.info("Calculate your reviewed workflow to explore a hypothetical change.")
 
 
 if __name__ == "__main__":
