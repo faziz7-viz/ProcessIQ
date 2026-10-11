@@ -1,0 +1,4 @@
+step_name,responsible_role,active_minutes,waiting_minutes,people,hourly_rate_usd,monthly_volume,process_name,start_point,end_point
+Review request,Coordinator,10,0,1,30,20,Synthetic painting quotes,Customer request arrives,Quote emailed
+Prepare quote,Estimator,30,60,1,60,,,,
+Email quote,Coordinator,5,0,1,30,,,,

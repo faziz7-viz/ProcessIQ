@@ -1,0 +1,23 @@
+[project]
+name = "processiq"
+version = "0.1.0"
+description = "Business process interviews, owner fact review, and deterministic assessment"
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=2,<3",
+    "pandas>=2.2,<4",
+    "plotly>=6,<7",
+    "pydantic>=2.12,<3",
+    "python-dotenv>=1,<2",
+    "streamlit>=1.65,<2",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+
+markers = ["live: opt-in real OpenAI API smoke test"]

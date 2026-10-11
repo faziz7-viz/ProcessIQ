@@ -1,0 +1,357 @@
+{
+  "name": "Contractor inquiry-to-estimate follow-up (synthetic demo)",
+  "start_point": "A customer inquiry is received",
+  "end_point": "The first estimate follow-up is completed",
+  "currency": "USD",
+  "data_kind": "synthetic",
+  "source_messages": [
+    {
+      "id": "owner-process",
+      "speaker": "owner",
+      "text": "This is a fictional contractor business for a course demo. We handle 20 estimate cases per month. The steps run sequentially for one representative case. Waiting minutes are elapsed time before work on the current step, inside the process boundaries, including nights and weekends. Hourly rates are labor costs per person, not customer billing rates. These demo inputs represent facts after simulated owner review."
+    },
+    {
+      "id": "owner-receive-inquiry",
+      "speaker": "owner",
+      "text": "Step 1: Receive inquiry. Responsible role: Office administrator. Active work takes 10 minutes per case. Waiting before work on this step takes 0 minutes per case. The number of people actively working is 1. Labor cost per person is USD 30.00 per hour."
+    },
+    {
+      "id": "owner-collect-details",
+      "speaker": "owner",
+      "text": "Step 2: Collect job details. Responsible role: Estimator. Active work takes 15 minutes per case. Waiting before work on this step takes 120 minutes per case. The number of people actively working is 1. Labor cost per person is USD 45.00 per hour."
+    },
+    {
+      "id": "owner-site-visit",
+      "speaker": "owner",
+      "text": "Step 3: Visit job site. Responsible role: Site assessment crew. Active work takes 60 minutes per case. Waiting before work on this step takes 1440 minutes per case. The number of people actively working is 2. Labor cost per person is USD 40.00 per hour."
+    },
+    {
+      "id": "owner-prepare-estimate",
+      "speaker": "owner",
+      "text": "Step 4: Prepare estimate. Responsible role: Estimator. Active work takes 45 minutes per case. Waiting before work on this step takes 240 minutes per case. The number of people actively working is 1. Labor cost per person is USD 45.00 per hour."
+    },
+    {
+      "id": "owner-send-estimate",
+      "speaker": "owner",
+      "text": "Step 5: Send estimate. Responsible role: Office administrator. Active work takes 5 minutes per case. Waiting before work on this step takes 0 minutes per case. The number of people actively working is 1. Labor cost per person is USD 30.00 per hour."
+    },
+    {
+      "id": "owner-follow-up",
+      "speaker": "owner",
+      "text": "Step 6: Follow up on estimate. Responsible role: Office administrator. Active work takes 10 minutes per case. Waiting before work on this step takes 2880 minutes per case. The number of people actively working is 1. Labor cost per person is USD 30.00 per hour."
+    }
+  ],
+  "monthly_volume": {
+    "value": 20,
+    "unit": "cases/month",
+    "confirmed": true,
+    "evidence": [
+      {
+        "message_id": "owner-process",
+        "quote": "We handle 20 estimate cases per month."
+      }
+    ]
+  },
+  "steps": [
+    {
+      "id": "receive-inquiry",
+      "order": 1,
+      "name": "Receive inquiry",
+      "responsible_role": "Office administrator",
+      "active_time": {
+        "value": "10",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-receive-inquiry",
+            "quote": "Active work takes 10 minutes per case."
+          }
+        ]
+      },
+      "waiting_time": {
+        "value": "0",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-receive-inquiry",
+            "quote": "Waiting before work on this step takes 0 minutes per case."
+          }
+        ]
+      },
+      "people": {
+        "value": 1,
+        "unit": "people",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-receive-inquiry",
+            "quote": "The number of people actively working is 1."
+          }
+        ]
+      },
+      "hourly_labor_cost": {
+        "value": "30.00",
+        "unit": "currency/hour",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-receive-inquiry",
+            "quote": "Labor cost per person is USD 30.00 per hour."
+          }
+        ]
+      }
+    },
+    {
+      "id": "collect-details",
+      "order": 2,
+      "name": "Collect job details",
+      "responsible_role": "Estimator",
+      "active_time": {
+        "value": "15",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-collect-details",
+            "quote": "Active work takes 15 minutes per case."
+          }
+        ]
+      },
+      "waiting_time": {
+        "value": "120",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-collect-details",
+            "quote": "Waiting before work on this step takes 120 minutes per case."
+          }
+        ]
+      },
+      "people": {
+        "value": 1,
+        "unit": "people",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-collect-details",
+            "quote": "The number of people actively working is 1."
+          }
+        ]
+      },
+      "hourly_labor_cost": {
+        "value": "45.00",
+        "unit": "currency/hour",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-collect-details",
+            "quote": "Labor cost per person is USD 45.00 per hour."
+          }
+        ]
+      }
+    },
+    {
+      "id": "site-visit",
+      "order": 3,
+      "name": "Visit job site",
+      "responsible_role": "Site assessment crew",
+      "active_time": {
+        "value": "60",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-site-visit",
+            "quote": "Active work takes 60 minutes per case."
+          }
+        ]
+      },
+      "waiting_time": {
+        "value": "1440",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-site-visit",
+            "quote": "Waiting before work on this step takes 1440 minutes per case."
+          }
+        ]
+      },
+      "people": {
+        "value": 2,
+        "unit": "people",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-site-visit",
+            "quote": "The number of people actively working is 2."
+          }
+        ]
+      },
+      "hourly_labor_cost": {
+        "value": "40.00",
+        "unit": "currency/hour",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-site-visit",
+            "quote": "Labor cost per person is USD 40.00 per hour."
+          }
+        ]
+      }
+    },
+    {
+      "id": "prepare-estimate",
+      "order": 4,
+      "name": "Prepare estimate",
+      "responsible_role": "Estimator",
+      "active_time": {
+        "value": "45",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-prepare-estimate",
+            "quote": "Active work takes 45 minutes per case."
+          }
+        ]
+      },
+      "waiting_time": {
+        "value": "240",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-prepare-estimate",
+            "quote": "Waiting before work on this step takes 240 minutes per case."
+          }
+        ]
+      },
+      "people": {
+        "value": 1,
+        "unit": "people",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-prepare-estimate",
+            "quote": "The number of people actively working is 1."
+          }
+        ]
+      },
+      "hourly_labor_cost": {
+        "value": "45.00",
+        "unit": "currency/hour",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-prepare-estimate",
+            "quote": "Labor cost per person is USD 45.00 per hour."
+          }
+        ]
+      }
+    },
+    {
+      "id": "send-estimate",
+      "order": 5,
+      "name": "Send estimate",
+      "responsible_role": "Office administrator",
+      "active_time": {
+        "value": "5",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-send-estimate",
+            "quote": "Active work takes 5 minutes per case."
+          }
+        ]
+      },
+      "waiting_time": {
+        "value": "0",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-send-estimate",
+            "quote": "Waiting before work on this step takes 0 minutes per case."
+          }
+        ]
+      },
+      "people": {
+        "value": 1,
+        "unit": "people",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-send-estimate",
+            "quote": "The number of people actively working is 1."
+          }
+        ]
+      },
+      "hourly_labor_cost": {
+        "value": "30.00",
+        "unit": "currency/hour",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-send-estimate",
+            "quote": "Labor cost per person is USD 30.00 per hour."
+          }
+        ]
+      }
+    },
+    {
+      "id": "follow-up",
+      "order": 6,
+      "name": "Follow up on estimate",
+      "responsible_role": "Office administrator",
+      "active_time": {
+        "value": "10",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-follow-up",
+            "quote": "Active work takes 10 minutes per case."
+          }
+        ]
+      },
+      "waiting_time": {
+        "value": "2880",
+        "unit": "minutes",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-follow-up",
+            "quote": "Waiting before work on this step takes 2880 minutes per case."
+          }
+        ]
+      },
+      "people": {
+        "value": 1,
+        "unit": "people",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-follow-up",
+            "quote": "The number of people actively working is 1."
+          }
+        ]
+      },
+      "hourly_labor_cost": {
+        "value": "30.00",
+        "unit": "currency/hour",
+        "confirmed": true,
+        "evidence": [
+          {
+            "message_id": "owner-follow-up",
+            "quote": "Labor cost per person is USD 30.00 per hour."
+          }
+        ]
+      }
+    }
+  ]
+}

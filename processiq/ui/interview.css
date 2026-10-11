@@ -1,0 +1,56 @@
+/* Deliberately scoped: the review and dashboard keep their existing controls. */
+@font-face {font-family: 'PI Geist'; src: url(data:font/ttf;base64,GEIST_DATA) format('truetype'); font-weight: 100 900; font-display: swap;}
+@font-face {font-family: 'PI Instrument'; src: url(data:font/ttf;base64,SERIF_DATA) format('truetype'); font-style: italic; font-weight: 400; font-display: swap;}
+body:has(.st-key-interview-screen) [data-testid='stHeader'] {display:none;}
+body:has(.st-key-interview-screen) .stMainBlockContainer {max-width:none; padding:0;}
+body:has(.st-key-interview-screen) .stMain {background:#fbfaf7;}
+.st-key-interview-screen {position:relative; isolation:isolate; min-height:100svh; padding: max(80px,18svh) 24px 70px; display:flex; justify-content:center; gap:0; font-family:'PI Geist',sans-serif;}
+.st-key-interview-screen::before, .st-key-interview-screen::after {content:''; position:fixed; inset:-8%; z-index:-1; pointer-events:none; filter:blur(36px); opacity:.85; will-change:transform;}
+.st-key-interview-screen::before {background:radial-gradient(ellipse at 0% 15%,#c5d8beaa 0%,transparent 41%),radial-gradient(ellipse at 95% 16%,#d9c9e699 0%,transparent 37%),radial-gradient(ellipse at 100% 100%,#efccb299 0%,transparent 44%); animation:pi-wash 28s ease-in-out infinite alternate;}
+.st-key-interview-screen::after {background:radial-gradient(ellipse at 10% 100%,#e1dded88,transparent 37%),radial-gradient(ellipse at 88% 90%,#f8e8cd88,transparent 38%); animation:pi-wash 24s ease-in-out infinite alternate-reverse;}
+@keyframes pi-wash {from{transform:translate3d(-1%,-1%,0) scale(1);} to{transform:translate3d(2%,1.5%,0) scale(1.035);}}
+.st-key-interview-stage {width:min(100%,760px); margin:auto; gap:28px; position:relative;}
+.pi-question {font-family:'PI Geist',sans-serif !important; font-size:clamp(30px,3.6vw,46px) !important; font-weight:400 !important; letter-spacing:-.04em !important; line-height:1.2 !important; text-align:center; color:#303932; margin:0 auto !important; padding:0 !important; max-width:740px; text-wrap:balance; animation:pi-arrive 230ms 190ms both;}
+.pi-question em {font-family:'PI Instrument',Georgia,serif; font-weight:400; letter-spacing:-.025em;}
+@keyframes pi-arrive {from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pi-leave {to{opacity:0;transform:translateY(-6px);}}
+.st-key-interview-screen [data-stale='true'] .pi-question {visibility:hidden;}
+.st-key-interview-answer {width:min(100%,600px); margin:0 auto;}
+.st-key-interview-answer [data-testid='stHorizontalBlock'] {display:grid; grid-template-columns:minmax(0,1fr) 48px; gap:10px; align-items:center;}
+.st-key-interview-answer [data-testid='stColumn'] {min-width:0 !important; width:100% !important;}
+.st-key-interview-answer [data-testid='stTextInputRootElement'] {height:56px; border-radius:28px; background:rgba(255,255,255,.92); border:1px solid #d7d9d1; box-shadow:0 5px 22px #3b514809;}
+.st-key-interview-answer input {font-family:'PI Geist',sans-serif; font-size:15px; color:#303932; padding:0 22px; height:54px;}
+.st-key-interview-answer input::placeholder {color:#69716c; opacity:1; transition:opacity 160ms ease;}
+.st-key-interview-answer input.pi-hint-changing::placeholder {opacity:0;}
+.st-key-interview-answer [data-testid='stTextInputRootElement']:focus-within {border-color:#556f5c; box-shadow:0 0 0 3px #8b9e7f40;}
+.st-key-interview-answer [data-testid='InputInstructions'] {display:none;}
+.st-key-interview-voice [data-testid='stPopoverButton'] {width:48px; height:48px; min-height:48px; border-radius:50%; border:1px solid #d7d9d1; color:#435447; background:#ffffffe6; padding:0;}
+.st-key-interview-voice [data-testid='stPopoverButton'] p {position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap;}
+.st-key-interview-actions {margin:0 auto; gap:20px; justify-content:center;}
+.st-key-interview-actions button {font-family:'PI Geist',sans-serif; font-weight:400; font-size:13px; border-radius:24px; padding:10px 17px; min-height:44px; background:transparent; color:#4d5b51; border:1px solid transparent;}
+.st-key-interview-actions button[kind='primary'] {background:#364e40; color:#fff; border-color:#364e40; box-shadow:0 3px 9px #334c3510;}
+.st-key-interview-actions button:hover {background:#e9eee6; color:#243c2c;}
+.st-key-interview-actions button[kind='primary']:hover {background:#263f30; color:white;}
+.st-key-interview-screen button:focus-visible {outline:3px solid #607d67; outline-offset:4px;}
+.st-key-interview-options {position:absolute; top:24px; right:24px; width:auto; z-index:2;}
+.st-key-interview-options [data-testid='stPopoverButton'] {font-family:'PI Geist',sans-serif; font-size:12px; color:#5e695f; background:transparent; border:0; min-height:44px;}
+.st-key-interview-finish {margin:0 auto;}
+.st-key-interview-finish button {font-family:'PI Geist',sans-serif; font-size:13px; color:#435f4e; background:#ffffff80; border:1px solid #ced9ca; border-radius:24px; min-height:44px;}
+.st-key-interview-stage [data-testid='stCaptionContainer'], .st-key-interview-stage [data-testid='stMarkdownContainer'] p {text-align:center; color:#5c665e;}
+@media(max-width:640px) {
+ .st-key-interview-screen {padding:100px 20px 60px;}
+ .st-key-interview-stage {gap:24px;}
+ .pi-question {font-size:32px !important; max-width:360px; line-height:1.18 !important;}
+ .st-key-interview-answer input {font-size:14px; padding:0 17px;}
+ .st-key-interview-actions {gap:4px;}
+ .st-key-interview-actions button {padding:10px 12px;}
+ .st-key-interview-options {top:14px; right:14px;}
+}
+@media(prefers-reduced-motion:reduce) {
+ .st-key-interview-screen::before,.st-key-interview-screen::after {animation:none; will-change:auto;}
+ .pi-question {animation:none !important;}
+ .st-key-interview-answer input::placeholder {transition:none;}
+}
+
+.st-key-interview-actions [data-testid='stMarkdownContainer'] p {color:inherit;}
+.st-key-interview-voice [data-testid='stPopoverButton'] > svg {display:none;}

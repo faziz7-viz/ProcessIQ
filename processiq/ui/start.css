@@ -1,0 +1,17 @@
+.stApp {background: #f8f9f7; color: #182733;}
+.stMainBlockContainer {max-width: 850px; padding-top: 2.5rem; padding-bottom: 3rem;}
+[data-testid="stSidebar"] {background: #f0f3f1; border-right: 1px solid #dde5df;}
+.st-key-start-screen h1 {font-family: Georgia, serif; font-weight: 400; font-size: 2.7rem; letter-spacing: -.07rem;}
+.st-key-start-screen [role="radiogroup"] {gap: .7rem; margin: .4rem 0 .5rem; width: 100%;}
+.st-key-start-screen [role="radiogroup"] > div {background: white; border: 1px solid #d7e0da; border-radius: 10px; padding: .8rem 1rem; width: 100%;}
+.st-key-start-screen [role="radiogroup"] label {width: 100%; align-items: center; font-weight: 600;}
+.st-key-start-screen [role="radiogroup"] > div:has(input:checked) {border-color: #365f51; background: #f0f7f3; box-shadow: 0 0 0 1px #365f51;}
+.st-key-start-screen [data-testid="stRadioCaption"] {margin-top: .15rem;}
+.st-key-start-screen [data-testid="stFileUploader"] {background: white; border-radius: 10px;}
+.st-key-start-screen [data-testid="stBaseButton-primary"] {background: #173e33; border-color: #173e33; color: white; min-height: 2.8rem;}
+.st-key-start-screen [data-testid="stBaseButton-primary"]:hover {background: #245846; border-color: #245846;}
+.st-key-start-screen [data-testid="stBaseButton-primary"]:disabled {background: #e0e8e2; border-color: #d7e0da; color: #52635b;}
+@media (max-width: 700px) {
+  .stMainBlockContainer {padding: 1.5rem 1rem;}
+  .st-key-start-screen h1 {font-size: 2.1rem;}
+}
