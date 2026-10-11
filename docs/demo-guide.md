@@ -23,9 +23,10 @@ presentation. Keep your API key off screen.
    and CSV row evidence. No interview has been started and no API call is needed.
 3. Check the workflow and numeric values, select **This matches the workflow I want
    to assess** and **Confirm all provided values on save**, then **Save reviewed facts**.
-4. **Calculate dashboard** shows $37.50 per case, $750.00 per month for 20 cases,
-   and 105 elapsed minutes. **Create offline plan** produces evidence-linked actions.
-5. Change Prepare quote from 30 to 20 active minutes, confirm/save, and recalculate:
+4. **Calculate dashboard** opens Overview with $37.50 per case, $750.00 per month
+   for 20 cases, and 105 elapsed minutes. Open **Improvements → Create offline plan**
+   for evidence-linked actions.
+5. Open **Workflow**, change Prepare quote from 30 to 20 active minutes, confirm/save, and recalculate:
    $27.50 per case and $550.00 per month. Values left blank stay unknown, not zero.
 6. Use **Choose data source** to explore the sample workflows or optional interview.
 
@@ -42,22 +43,36 @@ required. Per-task weekly frequencies are not converted into monthly case volume
    $2,750.00 projected monthly labor cost for 20 cases. Explain that waiting is
    not charged as labor. Follow-up has 2,880 waiting minutes; the site visit has
    120 person-minutes. These are contributions, not proven causes or capacity limits.
-4. Click **Create offline plan**, or **Generate AI plan** if live AI is configured.
+4. Open **Improvements** and click **Create offline plan**, or **Generate AI plan** if live AI is configured.
    Show supporting evidence and actions with suggested owner, qualitative effort,
    and a measurement to track. Explain that this does not promise savings.
-5. Expand **4. Prepare estimate**, change active minutes from 45 to 30, and show
+5. Open **Workflow**, expand **4. Prepare estimate**, change active minutes from 45 to 30, and show
    that the dashboard and plan disappear. Confirm the changed value, save, and
    recalculate. The new cost is $126.25 per case and $2,525.00 per month. Create a
    new plan. The original sources remain and the correction has a new source.
-6. Click **Reset current demo**. The original 45-minute value returns; old results
+6. Open **Data & options → Reset current demo**. The original 45-minute value returns; old results
    clear. Reset never edits the fixture files.
-7. Load **Incomplete contractor demo** and calculate. Full cost is **Unavailable**,
+7. Use **Data & options → Choose data source**, load **Incomplete contractor demo** and calculate. Full cost is **Unavailable**,
    with a **$5.00 known subtotal**. Missing and unconfirmed values are not zero.
    Create an offline plan; its first action collects and confirms missing facts.
 8. Optionally show the live interview using the single-step synthetic description
    below. All extracted numbers start unconfirmed. Review them before calculation.
    **Restart AI interview** clears that conversation. **Return to saved process**
    returns to the prior saved process and preserves pending review edits.
+
+For the five-minute course recording, use [the timed script](week1-video-script.md).
+The [Week 1 report](week1-submission.md) records datasets, actual prompt excerpts,
+iterations, screenshots, and learning observations.
+
+## Interactive scenario demonstration
+
+Start a fresh session at `http://127.0.0.1:8501/?demo=complete` (use port 8502 if
+running the existing review preview). In **What if**, select **04 · Prepare estimate**
+and set **Active time reduction** to **30%**, keeping waiting reduction at zero.
+The hypothetical cost is **$127.38 per case** and **$2,547.60 per month**.
+The **$202.40 monthly difference** follows the app's rounding policy; it is not
+realized savings. Return to Overview to show the unchanged **$137.50 / $2,750.00**
+baseline. **Reset scenario** clears the assumption without editing facts.
 
 ## Synthetic description for the live interview
 

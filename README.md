@@ -1,5 +1,22 @@
 # ProcessIQ
 
+## Week 1 submission
+
+ProcessIQ follows **Path C: build your own app** in the supplied October 2026
+Week 1 handout. The submission package includes a [project report with actual
+screenshots](docs/week1-submission.md), a [4:30 video script](docs/week1-video-script.md),
+and an updated [demo walkthrough](docs/demo-guide.md). The handout requires a Google
+Doc, a video no longer than five minutes, and the GitHub code link. Recording the
+personal walkthrough and submitting the form remain separate from completing the app.
+
+The native [Google Doc report](https://docs.google.com/document/d/13T2729aCEFSlX6jPcnCo87wv_LYl9PuB0AeNhdw-Lns/edit?usp=drivesdk)
+contains the verified six-page write-up and three app screenshots. See the
+[submission checklist](docs/week1-handoff.md) for links and remaining steps.
+
+Latest local verification (October 11, 2026): **345 passed, 3 opt-in live-provider
+tests skipped**, using `.venv/bin/python -m pytest -W error -q`. No live provider
+requests were made for this final check.
+
 ## Premium insights workspace
 
 ProcessIQ now includes a warm, responsive dashboard for small-business owners:
@@ -67,7 +84,8 @@ assessment or the interview's Options menu, use **Choose data source** to return
 2. Upload a UTF-8 CSV with one row per sequential step, then select **Review uploaded data**.
 3. Correct any facts or scope labels, check **This matches the workflow I want to assess**,
    confirm the values you know, and select **Save reviewed facts**.
-4. Select **Calculate dashboard**, then **Create offline plan** or **Generate AI plan**.
+4. Select **Calculate dashboard**, then open **Improvements** and choose
+   **Create offline plan** or **Generate AI plan**.
    Only the latter sends the saved assessment to OpenAI. Upload and review are local.
 
 | Column | Meaning |
