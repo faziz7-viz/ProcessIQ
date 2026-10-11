@@ -28,39 +28,47 @@
 - [x] Inspect repository and permissions; create dedicated private repository because parent is read-only and ProcessIQ untracked.
 - [x] Verify baseline with `.venv/bin/python -m pytest -W error -q`: 280 passed, 3 skipped.
 - [x] Ignore environment, local cache and scratch artifacts; inspect staged files for credentials.
-- [ ] Push baseline/tag, create feature branch, commit this design/plan.
+- [x] Push baseline/tag, create feature branch, commit this design/plan.
 
 ## Task 2: Insight explorer
 Files: processiq/dashboard.py, processiq/insights.py, tests/test_dashboard.py, tests/test_insights.py.
 Interface: retain format_metric(metric), step_table(analysis), build_charts(analysis); render_dashboard(analysis, workflow=None) may return selected step ID. No imports from recommendations to avoid existing circular dependency.
-- [ ] Add/run failing behavior tests for safe percentages, human time, missing values, stable selection and descending charts.
-- [ ] Implement evidence-derived hero, primary metrics, selectable chart lenses, selected step details and exact tables.
-- [ ] Verify focused tests. Root integrates global CSS and workspace navigation.
+- [x] Add/run failing behavior tests for safe percentages, human time, missing values, stable selection and descending charts.
+- [x] Implement evidence-derived hero, primary metrics, selectable chart lenses, selected step details and exact tables.
+- [x] Verify focused tests. Root integrates global CSS and workspace navigation.
 
 ## Task 3: App shell and presentation
 Files: app.py, processiq/presentation.py, processiq/ui/app.css, processiq/ui/start.css, .streamlit/config.toml, tests/test_workspace.py; existing journey tests updated only for intentional navigation changes.
 Interface: presentation.app_css() returns local-font CSS; workspace view persisted as a session value; existing edit/invalidation/provider callbacks remain authoritative.
-- [ ] Add/run failing navigation and draft-preservation tests.
-- [ ] Implement refined source screen, compact sidebar, process header, workspaces, save/calculate routing and contextual controls.
-- [ ] Style dashboard and plan consistently; preserve interview presentation.
-- [ ] Verify app/CSV/interview/plan tests, commit and push tested milestone.
+- [x] Add/run failing navigation and draft-preservation tests.
+- [x] Implement refined source screen, compact sidebar, process header, workspaces, save/calculate routing and contextual controls.
+- [x] Style dashboard and plan consistently; preserve interview presentation.
+- [x] Verify app/CSV/interview/plan tests, commit and push tested milestone.
 
 ## Task 4: Hypothetical scenarios and action cards
 Files: processiq/scenarios.py, processiq/scenario_ui.py, processiq/report.py, tests/test_scenarios.py.
 Interface: render_scenarios(workflow, analysis) displays an isolated comparison. Pure scenario helper accepts workflow + stable step ID + active/wait reduction percentages; returns baseline/hypothetical calculated metrics without mutating Workflow.
-- [ ] Add/run failing tests for unchanged baseline, 0 and 100 percent reduction, missing inputs and Decimal rounding.
-- [ ] Implement hypothetical comparisons and clear labels; no provider calls or saved confirmations.
-- [ ] Refine plan into cards with effort, owner, expandable measurement and linked evidence.
-- [ ] Verify focused tests; root integrates workspace and CSS.
+- [x] Add/run failing tests for unchanged baseline, 0 and 100 percent reduction, missing inputs and Decimal rounding.
+- [x] Implement hypothetical comparisons and clear labels; no provider calls or saved confirmations.
+- [x] Refine plan into cards with effort, owner, expandable measurement and linked evidence.
+- [x] Verify focused tests; root integrates workspace and CSS.
 
 ## Task 5: Verification and delivery
-- [ ] Run full offline suite with warnings as errors; fix regressions with focused tests.
-- [ ] Independent code review of validity, navigation, missing facts, safe markup and scenarios.
-- [ ] Browser verification of overview, chart selection, review correction, incomplete data, offline plan, scenario and narrow screen.
-- [ ] Add GitHub Actions offline checks and update README with usage and checkpoint workflow.
-- [ ] Commit/push final tested build, retain baseline tag, open local app preview and report URL/repository.
+- [x] Run full offline suite with warnings as errors; fix regressions with focused tests.
+- [x] Independent code review of validity, navigation, missing facts, safe markup and scenarios.
+- [x] Browser verification of overview, chart selection, review correction, incomplete data, offline plan, scenario and narrow screen.
+- [x] Add GitHub Actions offline checks and update README with usage and checkpoint workflow.
+- [x] Commit/push final tested build, retain baseline tag, open local app preview and report URL/repository.
 
 ## Execution ledger
 - Ruling: user requested autonomous implementation; written-spec and plan approval pauses are waived by that explicit request.
 - Ruling: use a dedicated repository and feature branch in the current project directory, isolating it from the unrelated parent course repository without relocating the running app.
 - Ruling: delegate independent dashboard and scenario/report files; root owns navigation, global design system, integration, Git and verification.
+
+## Verification record
+- Offline suite: **345 passed, 3 opt-in live-provider tests skipped**, warnings treated as errors. No live provider requests were made.
+- Independent review checked preserved facts, missing values, stable identifiers, safe HTML, scenarios, and a 200-step workflow. A hero percentage double-rounding issue was fixed with a regression test.
+- Browser checks: complete and incomplete dashboards, direct bar selection and evidence update, step and lens controls, offline action plans, a 30% active-time scenario with unchanged baseline, correction/confirmation/save/recalculate, and a 400-pixel responsive layout.
+- Browser testing found that Plotly needs explicit `dragmode="pan"` for click selection in the installed Streamlit version. Both axes remain fixed; a real click and a simulated Streamlit event now verify the full selection flow.
+- Scenario example: reducing the 45-minute estimate step by 30% produces $127.38 per case and $2,547.60 per month, clearly labeled hypothetical; the reviewed baseline remains $137.50/$2,750.00.
+- Git: private `faziz7-viz/ProcessIQ`, preserved `baseline-v0.1.0`, tested feature checkpoints, pinned GitHub Actions dependencies, and the premium release on main. The user's explicit autonomous Git instruction covers integration without another approval pause.

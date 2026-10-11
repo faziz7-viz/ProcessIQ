@@ -55,7 +55,7 @@ def hero_insight(analysis: WorkflowAnalysis) -> HeroInsight:
         if analysis.total_waiting_minutes.value == 0:
             title = "Every recorded minute is active work."
         else:
-            title = f"{share.quantize(Decimal('1'), rounding=ROUND_HALF_UP)}% of elapsed time is waiting."
+            title = f"{decimal_text(share)}% of elapsed time is waiting."
         return HeroInsight(
             title,
             f"{decimal_text(analysis.total_waiting_minutes.value)} of "

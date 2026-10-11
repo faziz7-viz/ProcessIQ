@@ -446,15 +446,16 @@ def render_sidebar() -> None:
         st.html(brand_html())
         st.html('<div class="pi-nav-label">YOUR WORKSPACE</div>')
         icons = {"Overview": "space_dashboard", "Workflow": "account_tree", "Improvements": "north_east", "What if": "tune"}
-        for view, icon in icons.items():
-            st.button(view, key=f"nav-{view}", icon=f":material/{icon}:", width="stretch",
-                      type="primary" if st.session_state.workspace == view else "tertiary",
-                      on_click=navigate_workspace, args=(view,))
+        with st.container(key="sidebar-nav", gap="xxsmall"):
+            for view, icon in icons.items():
+                st.button(view, key=f"nav-{view}", icon=f":material/{icon}:", width="stretch",
+                          type="primary" if st.session_state.workspace == view else "tertiary",
+                          on_click=navigate_workspace, args=(view,))
         st.html('<div class="pi-sidebar-separator"></div>')
         with st.container(key="sidebar-context"):
             st.caption("CURRENT ASSESSMENT")
             workflow = st.session_state.workflow
-            name = workflow.name.replace(" (synthetic demo)", "")
+            name = workflow.name.replace(" (synthetic demo)", "").replace(" (incomplete synthetic demo)", "")
             st.write(name)
             st.caption(f"{len(workflow.steps)} steps · USD · Sequential workflow")
             if st.session_state.dirty:
@@ -484,7 +485,7 @@ def render_process_header() -> None:
     facts = [workflow.monthly_volume] + [getattr(step, field) for step in workflow.steps for field in FACT_FIELDS]
     reviewed = sum(fact.value is not None and fact.confirmed for fact in facts)
     source = "Synthetic sample" if workflow.data_kind == "synthetic" else "Your workflow"
-    name = workflow.name.replace(" (synthetic demo)", "")
+    name = workflow.name.replace(" (synthetic demo)", "").replace(" (incomplete synthetic demo)", "")
     title, action = st.columns([5, 1.1], vertical_alignment="center")
     with title:
         st.html(f'<div class="pi-page-heading"><span class="pi-eyebrow">WORKFLOW ASSESSMENT</span><h1>{escape(name)}</h1><div class="pi-meta"><span class="pi-chip">{source}</span><span>{len(workflow.steps)} steps</span><span>{reviewed} of {len(facts)} facts reviewed</span></div></div>')

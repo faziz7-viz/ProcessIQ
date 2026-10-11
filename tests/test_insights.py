@@ -71,3 +71,13 @@ def test_blockers_use_business_names_and_keep_missing_distinct_from_unconfirmed(
     assert all("steps." not in label for label in labels)
     assert any("missing" in label.lower() for label in labels)
     assert any("confirm" in label.lower() for label in labels)
+
+
+@pytest.mark.parametrize("waiting,expected", [("49.49", "49.5%"), ("99.49", "99.5%")])
+def test_hero_percentage_rounds_only_once(waiting, expected):
+    from processiq.insights import hero_insight
+    result = analyze_workflow(sample()).model_copy(update={
+        "total_waiting_minutes": metric(waiting),
+        "total_elapsed_minutes": metric("100"),
+    })
+    assert hero_insight(result).title == f"{expected} of elapsed time is waiting."

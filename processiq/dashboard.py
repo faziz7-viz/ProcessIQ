@@ -90,7 +90,9 @@ def build_charts(
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Geist, sans-serif", size=12, color="#202824"),
             hoverlabel=dict(bgcolor="white", font=dict(family="Geist, sans-serif", color="#202824")),
-            clickmode="event+select", dragmode=False,
+            # Keep the native point-selection path interactive. Fixed axes above
+            # prevent panning without disabling Plotly's pointer event machinery.
+            clickmode="event+select", dragmode="pan",
         )
         charts[key] = figure
     return charts
@@ -123,12 +125,10 @@ def hero_html(analysis: WorkflowAnalysis) -> str:
     finding = hero_insight(analysis)
     kind = "Synthetic example" if analysis.data_kind == "synthetic" else "Owner-provided facts"
     return (
-        '<section class="pi-hero" aria-label="Process insight">'
-        f'<p class="pi-eyebrow">THE BIG PICTURE · {escape(analysis.workflow_name)}</p>'
+        f'<section class="pi-hero" aria-label="Process insight for {escape(analysis.workflow_name)}. {escape(kind)}.">'
+        '<p class="pi-eyebrow">THE BIG PICTURE</p>'
         f'<h2 class="pi-hero-title">{escape(finding.title)}</h2>'
         f'<p class="pi-hero-copy">{escape(finding.description)}</p>'
-        f'<span class="pi-chip">{escape(kind)}</span> '
-        '<span class="pi-chip">One representative case</span>'
         '</section>'
     )
 
@@ -149,7 +149,7 @@ def _render_metrics(analysis: WorkflowAnalysis, workflow: Workflow | None) -> li
     if workflow is not None and workflow.monthly_volume.confirmed:
         captions[2] = f"At {workflow.monthly_volume.value:,} cases per month"
     for index, (column, (label, metric)) in enumerate(zip(st.columns(3), primary, strict=True)):
-        with column, st.container(border=True, key=f"pi-primary-{index}"):
+        with column, st.container(border=False, key=f"pi-primary-{index}"):
             value = human_duration(metric.value) if index == 0 else format_metric(metric)
             st.metric(label, value)
             st.caption(f"{format_metric(metric)} minutes · 24-hour days" if index == 0 and metric.value is not None else captions[index])
@@ -163,7 +163,8 @@ def _render_metrics(analysis: WorkflowAnalysis, workflow: Workflow | None) -> li
         with column, st.container(key=f"pi-secondary-{index}"):
             st.metric(label, format_metric(metric))
             _subtotal(metric)
-    st.caption("Calculated from saved, confirmed facts. Waiting adds elapsed time, not labor expense. "
+    provenance = "Synthetic example. " if analysis.data_kind == "synthetic" else "Owner-provided facts. "
+    st.caption(provenance + "Calculated from saved, confirmed facts. Waiting adds elapsed time, not labor expense. "
                "Monthly cost is a projection; costs exclude materials and overhead.")
     return primary + secondary
 
@@ -178,9 +179,11 @@ def _render_step_detail(step: StepAnalysis, analysis: WorkflowAnalysis, workflow
         st.markdown(f'<p class="pi-note">{escape(role)}</p>', unsafe_allow_html=True)
         values = [("Active time", step.active_minutes), ("Waiting before this step", step.waiting_minutes),
                   ("Labor cost", step.labor_cost)]
-        for column, (label, metric) in zip(st.columns(3), values, strict=True):
-            with column:
-                st.metric(label, format_metric(metric) + (" min" if metric.value is not None and metric.unit == "minutes" else ""))
+        rows = []
+        for label, metric in values:
+            value = format_metric(metric) + (" min" if metric.value is not None and metric.unit == "minutes" else "")
+            rows.append(f'<div><dt>{escape(label)}</dt><dd>{escape(value)}</dd></div>')
+        st.markdown('<dl class="pi-detail-facts">' + ''.join(rows) + '</dl>', unsafe_allow_html=True)
         st.caption(f"Elapsed: {format_metric(step.elapsed_minutes)} min · "
                    f"Labor effort: {format_metric(step.labor_minutes)} person-minutes")
         blockers = tuple(dict.fromkeys(gap for _, metric in values for gap in metric.blocked_by))
@@ -232,34 +235,37 @@ def render_dashboard(analysis: WorkflowAnalysis, workflow: Workflow | None = Non
     if st.session_state.get("pi-selected-step") not in ids:
         st.session_state["pi-selected-step"] = analysis.waiting_ranking.entries[0].step_id if analysis.waiting_ranking.entries else ids[0]
     st.session_state["pi-step-picker"] = st.session_state["pi-selected-step"]
-    sort_column, step_column = st.columns([1, 2])
-    with sort_column:
-        sort = st.selectbox("Order steps", ["Process order", "Largest contribution"], key="pi-chart-sort")
-    with step_column:
-        st.selectbox("Inspect a step", ids, format_func=names.get, key="pi-step-picker", on_change=_select_picker_step)
-    selected = st.session_state["pi-selected-step"]
-    filtered = ids
-    if len(ids) > 12:
-        query = st.text_input("Find steps in the charts", placeholder="Search by step name or number", key="pi-chart-search")
-        filtered = [step_id for step_id in ids if query.casefold() in names[step_id].casefold()]
-        st.caption(f"Showing {len(filtered)} of {len(ids)} steps. Scroll within the chart to explore.")
-    time_tab, labor_tab, cost_tab = st.tabs(["Time", "Labor effort", "Labor cost"])
-    with time_tab:
-        mode = st.radio("Time shown", ["Active + waiting", "Active only", "Waiting only"], horizontal=True, key="pi-time-mode")
-    charts = build_charts(analysis, sort_by="contribution" if sort == "Largest contribution" else "process",
-                          time_mode={"Active + waiting": "combined", "Active only": "active", "Waiting only": "waiting"}[mode],
-                          step_ids=filtered, selected_step_id=selected)
-    for tab, key in ((time_tab, "time"), (labor_tab, "labor"), (cost_tab, "cost")):
-        with tab:
-            if not filtered:
-                st.info("No steps match that search. Clear it to see the process again.")
-            with st.container(height=520 if len(filtered) > 10 else "content", border=False):
-                st.plotly_chart(charts[key], width="stretch", theme=None, key=f"chart-{key}",
-                                on_select=partial(_select_chart_step, f"chart-{key}", analysis), selection_mode="points",
-                                config={"displayModeBar": False, "scrollZoom": False, "responsive": True},
-                                alt=f"{key.title()} contribution by process step. Use Inspect a step for exact values and source evidence.")
-            st.caption("Blank bars mean unavailable inputs. A recorded zero is still zero. Hover for exact values.")
-    _render_step_detail(next(step for step in analysis.steps if step.step_id == selected), analysis, workflow)
+    chart_column, detail_column = st.columns([1.8, 1], gap="large")
+    with chart_column:
+        sort_column, step_column = st.columns([1, 2])
+        with sort_column:
+            sort = st.selectbox("Order steps", ["Process order", "Largest contribution"], key="pi-chart-sort")
+        with step_column:
+            st.selectbox("Inspect a step", ids, format_func=names.get, key="pi-step-picker", on_change=_select_picker_step)
+        selected = st.session_state["pi-selected-step"]
+        filtered = ids
+        if len(ids) > 12:
+            query = st.text_input("Find steps in the charts", placeholder="Search by step name or number", key="pi-chart-search")
+            filtered = [step_id for step_id in ids if query.casefold() in names[step_id].casefold()]
+            st.caption(f"Showing {len(filtered)} of {len(ids)} steps. Scroll within the chart to explore.")
+        time_tab, labor_tab, cost_tab = st.tabs(["Time", "Labor effort", "Labor cost"])
+        with time_tab:
+            mode = st.radio("Time shown", ["Active + waiting", "Active only", "Waiting only"], horizontal=True, key="pi-time-mode")
+        charts = build_charts(analysis, sort_by="contribution" if sort == "Largest contribution" else "process",
+                              time_mode={"Active + waiting": "combined", "Active only": "active", "Waiting only": "waiting"}[mode],
+                              step_ids=filtered, selected_step_id=selected)
+        for tab, key in ((time_tab, "time"), (labor_tab, "labor"), (cost_tab, "cost")):
+            with tab:
+                if not filtered:
+                    st.info("No steps match that search. Clear it to see the process again.")
+                with st.container(height=520 if len(filtered) > 10 else "content", border=False):
+                    st.plotly_chart(charts[key], width="stretch", theme=None, key=f"chart-{key}",
+                                    on_select=partial(_select_chart_step, f"chart-{key}", analysis), selection_mode="points",
+                                    config={"displayModeBar": False, "scrollZoom": False, "responsive": True},
+                                    alt=f"{key.title()} contribution by process step. Use Inspect a step for exact values and source evidence.")
+                st.caption("Blank bars mean unavailable inputs. A recorded zero is still zero. Hover for exact values.")
+    with detail_column:
+        _render_step_detail(next(step for step in analysis.steps if step.step_id == selected), analysis, workflow)
     with st.expander("All steps · exact values"):
         st.dataframe(step_table(analysis), hide_index=True, width="stretch")
     with st.expander("Whole-process formulas and evidence"):
@@ -269,8 +275,4 @@ def render_dashboard(analysis: WorkflowAnalysis, workflow: Workflow | None = Non
             st.code(metric.formula, language=None)
             for item in metric.evidence:
                 st.text(f"{item.message_id}: {item.quote}")
-    st.markdown('<div class="pi-section-intro"><p class="pi-eyebrow">YOUR NEXT MOVE</p>'
-                '<h3>Turn the findings into a small experiment.</h3>'
-                '<p class="pi-note">Open Improvements for an evidence-linked action plan, '
-                'or What if to explore a change before trying it.</p></div>', unsafe_allow_html=True)
     return selected

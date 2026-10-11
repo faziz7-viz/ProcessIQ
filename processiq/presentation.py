@@ -15,12 +15,16 @@ OPENING_HINTS = [
 ]
 
 
-@lru_cache(maxsize=1)
 def app_css():
     css = (UI / 'app.css').read_text()
     for token, filename in [('GEIST_DATA', 'Geist.ttf'), ('SERIF_DATA', 'InstrumentSerif-Italic.ttf')]:
-        css = css.replace(token, base64.b64encode((UI / 'fonts' / filename).read_bytes()).decode())
+        css = css.replace(token, _font_data(filename))
     return css
+
+
+@lru_cache(maxsize=2)
+def _font_data(filename):
+    return base64.b64encode((UI / 'fonts' / filename).read_bytes()).decode()
 
 
 def brand_html():

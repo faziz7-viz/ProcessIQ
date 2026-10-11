@@ -45,9 +45,9 @@
 .stButton button[kind="primary"]:hover {background:#244a37;border-color:#244a37;}
 .stButton button:focus-visible,[role="tab"]:focus-visible {outline:3px solid #6c8872;outline-offset:3px;box-shadow:none;}
 .stButton button:disabled {background:#e8ede5;color:#7b8779;border-color:#e0e6dc;box-shadow:none;}
-.stTabs [data-baseweb="tab-list"] {gap:22px;border-bottom:1px solid #e0e6dc;margin-bottom:18px;}
-.stTabs [data-baseweb="tab"] {height:45px;color:#707a70;padding:0 2px;font-size:12px;font-weight:500;}
-.stTabs [data-baseweb="tab"] p {font-size:12px;}
+.stTabs [role="tablist"] {gap:22px;border-bottom:1px solid #e0e6dc;margin-bottom:18px;}
+.stTabs [role="tab"] {height:45px;color:#707a70;padding:0 2px;font-size:12px;font-weight:500;}
+.stTabs [role="tab"] p {font-size:12px;}
 .stTabs [aria-selected="true"] {color:#315c49;}
 .stTabs [data-baseweb="tab-highlight"] {background:#315c49;height:2px;border-radius:3px;}
 .stTabs [data-baseweb="tab-border"] {display:none;}
@@ -62,10 +62,12 @@
 [data-testid="stMetricValue"] {font-family:'PI Geist',sans-serif;font-size:clamp(27px,2.7vw,38px);font-weight:450;letter-spacing:-1.5px;color:#253d2e;font-variant-numeric:tabular-nums;line-height:1.45;}
 [class*="st-key-pi-secondary-"] [data-testid="stMetric"] {background:transparent;min-height:auto;border:0;padding:8px 4px;border-radius:0;box-shadow:none;}
 [class*="st-key-pi-secondary-"] [data-testid="stMetricValue"] {font-size:20px;letter-spacing:-.7px;}
-[data-testid="stCaptionContainer"] {color:#737e70;}
+.stApp [data-testid="stCaptionContainer"] {color:#626f5e;opacity:1;}
 [data-testid="stCaptionContainer"] p {font-size:11px;line-height:1.65;}
+.stApp [data-testid="stCaptionContainer"] p {color:#626f5e;}
 .pi-note {color:#6b7867;font-size:12px;line-height:1.65;}
 .pi-stat-label {font-size:11px;color:#6e7869;}
+.stApp .pi-stat-label {font-size:11px !important;color:#626f5e;}
 .pi-section-intro {padding:20px 0 9px;}
 .pi-section-intro h2 {margin:9px 0;padding:0;}
 .pi-section-intro p {color:#6b7867;font-size:13px;max-width:700px;}
@@ -101,8 +103,32 @@
  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {min-width:min(100%,260px);flex:1 1 260px;}
  .pi-page-heading h1 {font-size:26px;} .pi-meta {gap:10px;font-size:10px;}
  .pi-hero {padding:24px;border-radius:17px;} .pi-hero-title,.pi-hero h2 {font-size:29px;letter-spacing:-1.1px;}
- .stTabs [data-baseweb="tab-list"] {gap:18px;overflow:auto;}
+ .stTabs [role="tablist"] {gap:18px;overflow:auto;}
  [data-testid="stMetric"] {min-height:110px;} [data-testid="stMetricValue"] {font-size:34px;}
  .pi-empty-plan {padding:35px 18px;} .pi-section-intro h2 {font-size:24px;}
 }
 @media(prefers-reduced-motion:reduce) {.pi-hero {animation:none;} .stButton button,.stDownloadButton button {transition:none;}}
+/* A single surface per metric; detail stays quiet beside the chart. */
+[class*="st-key-pi-primary-"] {background:white;border:1px solid #e1e6df;border-radius:16px;padding:21px 23px;}
+[class*="st-key-pi-primary-"] [data-testid="stMetric"] {border:0;background:transparent;padding:0;min-height:85px;box-shadow:none;}
+[class*="st-key-pi-primary-"] [data-testid="stCaptionContainer"] p {margin:0;}
+[class*="st-key-pi-scenario-comparison"] [data-testid="stMetric"] {border:0;background:transparent;padding:8px 0;min-height:100px;box-shadow:none;}
+.stApp .pi-eyebrow {font-size:10px !important;line-height:1.5;font-weight:600;letter-spacing:1.8px;margin:0;}
+.stApp .pi-note {font-size:12px !important;line-height:1.65;}
+.pi-hero {padding:27px 32px;}
+.pi-hero h2 {margin:12px 0;font-size:clamp(26px,2.7vw,37px);}
+.pi-hero .pi-hero-copy {max-width:750px;}
+.pi-detail-facts {margin:18px 0;}
+.pi-detail-facts > div {display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:13px 0;border-bottom:1px solid #e6ebe1;}
+.pi-detail-facts dt {font-size:11px;color:#73806c;}
+.pi-detail-facts dd {font-size:17px;font-weight:500;letter-spacing:-.5px;margin:0;color:#2e4937;font-variant-numeric:tabular-nums;text-align:right;}
+.st-key-pi-step-detail {padding:23px;border:1px solid #e1e6df;}
+.st-key-pi-step-detail h3 {font-size:19px;letter-spacing:-.6px;}
+.st-key-pi-step-detail blockquote {border-left:2px solid #d1ddc8;padding:3px 0 3px 12px;margin:10px 0;background:none;}
+.st-key-pi-step-detail blockquote p {color:#626f5e;}
+[data-testid="stSidebarUserContent"] {padding-top:1rem;}
+[data-testid="stSidebarHeader"] {height:34px;min-height:34px;padding:4px 12px;}
+[data-testid="stSidebar"] .pi-brand {padding-bottom:24px;}
+@media(min-width:900px) {.st-key-workspace > [role="tablist"] {display:none;}}
+@media(max-width:1050px) {.st-key-pi-step-detail {padding:17px;} [class*="st-key-pi-primary-"] {padding:17px;}}
+@media(min-width:900px) {.st-key-workspace > div > [role="tablist"],.st-key-workspace > div > div > [role="tablist"] {display:none;}}

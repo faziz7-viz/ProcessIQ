@@ -149,3 +149,39 @@ render_dashboard(analyze_workflow(workflow), workflow)
     app.text_input[0].set_value("No matching step").run()
     assert not app.exception
     assert any("No steps match" in item.value for item in app.info)
+
+
+def test_chart_point_selection_uses_explicit_interactive_mode_with_fixed_axes(dashboard):
+    for chart in dashboard.build_charts(analysis()).values():
+        assert chart.layout.clickmode == "event+select"
+        # Streamlit's selection frontend expects an interactive drag mode; fixed
+        # axes prevent pan/zoom without disabling Plotly's selection machinery.
+        assert chart.layout.dragmode == "pan"
+        assert chart.layout.xaxis.fixedrange is True
+        assert chart.layout.yaxis.fixedrange is True
+
+
+def test_plotly_widget_selection_event_updates_picker_and_step_evidence():
+    import json
+    from streamlit.testing.v1 import AppTest
+    script = '''
+from pathlib import Path
+from processiq.models import Workflow
+from processiq.analysis import analyze_workflow
+from processiq.dashboard import render_dashboard
+workflow = Workflow.model_validate_json(Path("data/contractor_estimate.json").read_text())
+render_dashboard(analyze_workflow(workflow), workflow)
+'''
+    app = AppTest.from_string(script).run()
+    chart = app.get("plotly_chart")[0]
+    states = app._tree.get_widget_states()
+    states.widgets.add(id=chart.proto.id, string_value=json.dumps({"selection": {
+        "points": [{"curve_number": 1, "point_number": 2, "point_index": 2,
+                    "x": 1500, "y": "site-visit", "customdata": ["site-visit", "1,440"]}],
+        "point_indices": [2], "box": [], "lasso": [],
+    }}))
+    app._run(states)
+    assert not app.exception
+    assert app.session_state["pi-selected-step"] == "site-visit"
+    assert app.selectbox(key="pi-step-picker").value == "site-visit"
+    assert any("3. Visit job site" in item.value for item in app.markdown)

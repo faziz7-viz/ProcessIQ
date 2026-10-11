@@ -1,5 +1,36 @@
 # ProcessIQ
 
+## Premium insights workspace
+
+ProcessIQ now includes a warm, responsive dashboard for small-business owners:
+
+- **Overview:** an evidence-derived headline, clear cost/time metrics, interactive chart lenses, sorting, step selection, and source evidence.
+- **Workflow:** review and confirm inputs; saving and calculating opens the overview. Unsaved corrections invalidate prior results.
+- **Improvements:** offline or explicitly requested AI plans, displayed as prioritized action cards with owners, effort and measurement guidance.
+- **What if:** explore assumed active/waiting time reductions without changing reviewed facts. Comparisons are hypothetical, not realized savings.
+
+Run locally with `uv run streamlit run app.py --server.address 127.0.0.1`.
+For an immediate sample dashboard, open `http://127.0.0.1:8501/?demo=complete`;
+use `?demo=incomplete` to inspect partial results. Query links initialize a new session
+only and never replace an existing assessment. The ordinary start screen remains available
+through **Data & options → Choose data source**.
+
+The custom fonts are local. The interface supports keyboard step selection, reduced motion,
+and charts with up to 200 imported steps. Source data remains session-only; this release does
+not add database storage, authentication or historical trends. Live AI remains optional.
+
+### Version control
+
+This directory is a standalone Git repository, separate from the parent course checkout.
+The private remote is [faziz7-viz/ProcessIQ](https://github.com/faziz7-viz/ProcessIQ).
+`baseline-v0.1.0` preserves the original working app. Work is committed in tested checkpoints
+on `feature/premium-insights` and pushed to GitHub. The finished dashboard is released on
+`main` as `v0.2.0`. GitHub Actions runs the offline suite on
+every push and pull request; live-provider tests remain opt-in and need no CI secrets.
+Environment files, caches and local preview artifacts are ignored.
+
+The design and implementation record are in `docs/superpowers/`.
+
 A Week 1 Mastering Agentic AI course project for small service businesses.
 
 **Current scope: Complete Week 1 demo (Milestones 1–6).** ProcessIQ has validated data, synthetic fixtures,

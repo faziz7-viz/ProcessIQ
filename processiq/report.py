@@ -23,15 +23,7 @@ def render_evidence(finding: Finding) -> None:
 
 
 def render_plan(plan: ImprovementPlan) -> None:
-    st.markdown('<p class="pi-eyebrow">FROM INSIGHT TO ACTION</p>', unsafe_allow_html=True)
-    st.subheader('Your improvement plan')
     st.caption('AI-prioritized plan' if plan.mode == 'ai' else 'Rule-based offline plan · No AI request')
-    st.caption('Choose a small trial with your team. Suggested owners and effort are starting points to agree together; no hours or implementation costs are estimated.')
-    with st.expander('What the numbers mean'):
-        for finding in plan.summary:
-            st.text(finding.explanation)
-            render_evidence(finding)
-    st.subheader('Suggested actions in priority order')
     for priority, action in enumerate(plan.actions, start=1):
         with st.container(border=True, key=f'pi-action-card-{priority}'):
             st.markdown(f'<p class="pi-eyebrow">PRIORITY {priority:02d}</p>', unsafe_allow_html=True)
@@ -57,6 +49,10 @@ def render_plan(plan: ImprovementPlan) -> None:
             with st.expander('Why this action'):
                 st.text(action.finding.explanation)
                 render_evidence(action.finding)
+    with st.expander('What the numbers mean'):
+        for finding in plan.summary:
+            st.text(finding.explanation)
+            render_evidence(finding)
     with st.expander('All findings and supporting evidence'):
         for finding in plan.findings:
             st.text(finding.explanation)
