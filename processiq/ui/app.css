@@ -10,8 +10,9 @@
 .stApp p {line-height:1.65;}
 .stMainBlockContainer {max-width:1460px;padding:2.5rem 3.2rem 4rem;}
 [data-testid="stHeader"] {background:transparent;height:2.5rem;}
-[data-testid="stToolbar"] {display:none;}
-[data-testid="stSidebar"] {background:#eef1eb;border-right:1px solid #dfe5dc;min-width:240px !important;max-width:240px !important;}
+[data-testid="stAppDeployButton"],[data-testid="stMainMenu"] {display:none;}
+[data-testid="stSidebar"] {background:#eef1eb;border-right:1px solid #dfe5dc;}
+[data-testid="stSidebar"][aria-expanded="true"] {min-width:240px !important;max-width:240px !important;}
 [data-testid="stSidebarContent"] {padding-top:0;}
 [data-testid="stSidebarUserContent"] {padding:2.4rem 1.25rem;}
 .pi-brand {display:flex;align-items:center;gap:12px;color:#263f32;font-size:24px;font-weight:600;letter-spacing:-1px;line-height:1.1;padding:0 0 30px;}
@@ -98,7 +99,7 @@
 @media(min-width:1500px) {.stMainBlockContainer {padding-left:4rem;padding-right:4rem;}}
 @media(max-width:1050px) {.stMainBlockContainer {padding:2rem 1.8rem 3rem;} [data-testid="stMetric"] {padding:16px;} .pi-hero {padding:25px;} .pi-page-heading h1 {font-size:27px;}}
 @media(max-width:700px) {
- .stMainBlockContainer {padding:3rem 1rem 2rem;} [data-testid="stSidebar"] {min-width:220px !important;max-width:240px !important;}
+ .stMainBlockContainer {padding:3rem 1rem 2rem;} [data-testid="stSidebar"][aria-expanded="true"] {min-width:220px !important;max-width:240px !important;}
  [data-testid="stHorizontalBlock"] {flex-wrap:wrap;gap:12px;}
  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {min-width:min(100%,260px);flex:1 1 260px;}
  .pi-page-heading h1 {font-size:26px;} .pi-meta {gap:10px;font-size:10px;}
