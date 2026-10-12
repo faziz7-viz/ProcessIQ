@@ -4,10 +4,11 @@
 
 ProcessIQ follows **Path C: build your own app** in the supplied October 2026
 Week 1 handout. The submission package includes a [project report with actual
-screenshots](docs/week1-submission.md), a [4:30 video script](docs/week1-video-script.md),
-and an updated [demo walkthrough](docs/demo-guide.md). The handout requires a Google
-Doc, a video no longer than five minutes, and the GitHub code link. Recording the
-personal walkthrough and submitting the form remain separate from completing the app.
+screenshots](docs/week1-submission.md), the [Loom demo recording](https://www.loom.com/share/5fff768f72cb4afab001b9d8b7c5ff5e),
+a [recording script](docs/week1-video-script.md), and an updated
+[demo walkthrough](docs/demo-guide.md). The handout requires a Google Doc, a video
+no longer than five minutes, and the GitHub code link. The recording link is supplied;
+final playback/duration checks, reviewer access, and form submission remain.
 
 The native [Google Doc report](https://docs.google.com/document/d/13T2729aCEFSlX6jPcnCo87wv_LYl9PuB0AeNhdw-Lns/edit?usp=drivesdk)
 contains the verified six-page write-up and three app screenshots. See the

@@ -1,5 +1,9 @@
 # ProcessIQ Week 1 video walkthrough
 
+Recorded demo: [Process IQ Demo: Time Tracking Insights](https://www.loom.com/share/5fff768f72cb4afab001b9d8b7c5ff5e).
+The script below is the prepared narration guide, not a transcript verified against
+the recording. Its target length does not establish the actual recording duration.
+
 Target length: **4 minutes 30 seconds**, leaving 30 seconds below the handout's
 five-minute limit. Record your screen and your own explanation. This file is a
 script, not a completed recording. Use the fictional examples throughout.

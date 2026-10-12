@@ -6,6 +6,7 @@ campaign fields, sample prompts, and deployment recipe do not govern this projec
 
 ## Prepared and verified
 
+- [Loom demo recording](https://www.loom.com/share/5fff768f72cb4afab001b9d8b7c5ff5e): supplied by the project owner. The browser displayed the title **Process IQ Demo: Time Tracking Insights** and **Public — Anyone can find and view** in its sharing dialog. Playback, audio, and the five-minute duration limit have not been independently verified.
 - [Google Doc project report](https://docs.google.com/document/d/13T2729aCEFSlX6jPcnCo87wv_LYl9PuB0AeNhdw-Lns/edit?usp=drivesdk): overview, datasets, actual prompt excerpts, step-by-step build, iterations, screenshots, observations, and limits. Created in My Drive → ChatGPT. Native readback verified the text and all three embedded screenshots.
 - [GitHub code](https://github.com/faziz7-viz/ProcessIQ): working app on main, baseline preserved, premium app release tagged v0.2.0, submission documents versioned alongside it.
 - [Recording script](week1-video-script.md): a 4:30 walkthrough covering the live result and AI-assisted build.
@@ -20,15 +21,30 @@ rendered pages were visually inspected.
 
 ## Remaining personal submission steps
 
-1. Record yourself explaining and demonstrating the app, **five minutes maximum**.
-   Use the timed script, then check playback, sound, and duration. No finished video
-   is included in this package.
+1. Check the linked recording's playback, sound, and duration: **five minutes maximum**.
+   The recording link is now included; it has not been checked against the script.
 2. Give course reviewers access to the document, video, and code. At wrap-up the
    Google Doc has only owner access and GitHub is private. No reviewer identities
-   have been supplied; no public sharing or invitations have been created.
+   have been supplied. No additional sharing changes or invitations were made
+   when packaging the recording.
 3. Submit the three links through the [course form](https://forms.gle/VpQz7ZnsgL1bYRqv6).
    This form has not been submitted on your behalf.
 
 The attached handout states **Sunday, October 11, 2026, 11:59 PM Pacific Time** as
 the deadline. It accepts late submissions through the same form, without Builder
 of the Week eligibility. It does not require public deployment for Path C.
+
+## Links to paste into the submission form
+
+Project: **ProcessIQ — Workflow Intelligence for Small Businesses**
+
+Path: **C — Build your own app**
+
+- Project document: https://docs.google.com/document/d/13T2729aCEFSlX6jPcnCo87wv_LYl9PuB0AeNhdw-Lns/edit?usp=drivesdk
+- Demo video: https://www.loom.com/share/5fff768f72cb4afab001b9d8b7c5ff5e
+- Source code: https://github.com/faziz7-viz/ProcessIQ
+
+Short description: ProcessIQ helps small-business owners understand workflow time
+and labor costs, inspect supporting evidence, explore improvement actions, and
+compare hypothetical changes. Built with Python and Streamlit using AI coding
+assistance, it supports sample data, CSV uploads, and an optional AI interview.

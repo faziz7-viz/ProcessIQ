@@ -14,6 +14,8 @@ Figure 1. Actual application capture on October 11. The synthetic example has 4,
 
 Code: https://github.com/faziz7-viz/ProcessIQ
 
+Video: https://www.loom.com/share/5fff768f72cb4afab001b9d8b7c5ff5e
+
 Release: v0.2.0. The repository includes the application, sample data, tests, setup instructions, and design records. Access is currently private.
 
 <!-- pagebreak -->
